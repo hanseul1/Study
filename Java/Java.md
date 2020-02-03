@@ -51,13 +51,44 @@
 
 #### Single Responsibility Principle(단일 책임 원칙)
 
+- 객체는 단 하나의 책임만 가져야한다.
+- 즉, 하나의 클래스는 하나의 기능만 수행한다.
+
+- 여러 클래스에서 공통적으로 사용하는 로깅, 보안, 트랜잭션 같은 기능들은 별도의 클래스로 분리하여 호출해 사용하도록 한다.
+
+  => AOP(Aspect Oriented Programming)
+
+- AOP는 Cross Cutting Concern(여러 클래스에서 공통적으로 수행되는 부가기능)을 Aspect라는 클래스로 분리하고, 다른 핵심 기능 클래스에서 weaving하여 사용하도록 한다.
+
 #### Open Closed Principle(개방-폐쇄 원칙)
+
+- 기존의 코드를 변경하지 않으면서 기능을 수정할 수 있어야 한다.
+- 즉,  인터페이스에서 구체적인 수행 코드는 캡슐화해 처리하도록 해야한다.
 
 #### Liskov Substitution Principle(리스코프 치환 원칙)
 
+- 부모클래스와 자식클래스 사이에 일관성이 있어야 한다.(일반화 관계 충족)
+
+- `is a kind of` 관계
+
+- 즉, 자식클래스는 최소한 부모클래스에서 수행 가능한 기능은 수행할 수 있어야 한다.
+
+  => 자식클래스는 부모클래스의 책임을 무시하거나 재정의 하지 않고 확장만 수행한다.
+
 #### Interface Segregation Principle(인터페이스 분리 원칙)
 
+- 인터페이스를 클라이언트에 특화되도록 분리해야 한다.
+- 클라이언트가 각각 필요한 메서드만 사용할 수 있도록 클라이언트에 특화된 인터페이스를 설계해야 한다.
+
 #### Dependency Inversion Principle(의존 역전 원칙)
+
+- 클래스간 의존 관계를 맺을 때, 변하기 쉬운 것 보다는 변화가 없는 것에 의존을 하도록 설계해야 한다.
+
+- 즉, 변하기 어려운 추상적인 추상클래스나 인터페이스에 의존하도록 한다.
+
+  => 의존성 주입시 구체적인 클래스보다는 추상클래스 또는 인터페이스를 주입하도록 한다.
+
+  
 
 - 참고 : https://gmlwjd9405.github.io/2018/07/05/oop-solid.html
 
@@ -104,6 +135,16 @@
 
 ## Wrapper Class
 
+- Java의 기본형 데이터 타입을 객체화 시키는 클래스
+- Integer, Short, Byte, Long, Float, Double 등
+
+#### AutoBoxing & UnBoxing
+
+- AutoBoxing
+  - primitive 타입의 데이터를 자동으로 wrapper class의 객체로 변환하는 과정
+- Unboxing
+  - wrapper class 타입의 데이터를 primitive 타입으로 변환하는 과정
+
 ## Modifier
 
 #### Access Modifier
@@ -127,6 +168,8 @@
   - final variable : 상수
   - final method : overriding 불가
 - abstract : class, method
+  - abstract class
+    - 최소 한개 이상의 추상메서드를 포함하는 클래스 또는 abstract로 선언된 클래스
 
 ## Interface
 
@@ -138,12 +181,17 @@
   - 인터페이스의 모든 method는 abstract method이다.
   - 구현 클래스에서 overriding시 메소드는 항상 public 제한자를 가져야 한다.
 
-- 추상클래스와 인터페이스의 차이점
-  - 서로 다른 목적을 가지고 있다.
-    - 추상클래스는 추상메서드를 자식 클래스가 구체화하여 그 기능을 확장하는데 목적이 있다.
-    - 인터페이스는 서로 관련이 없는 클래스에서 공통적으로 사용하는 방식이 필요하지만 각각 구현할 필요가 있을 경우에 사용한다.
-  - 추상클래스는 `is a kind of` 인터페이스는 `can do this`
-  - 추상클래스는 단일 상속, 인터페이스는 다중 상속 가능
+
+#### 추상클래스와 인터페이스의 차이점
+
+- 서로 다른 목적을 가지고 있다.
+  - 추상클래스는 추상메서드를 자식 클래스가 구체화하여 그 기능을 확장하는데 목적이 있다.
+  
+  - 인터페이스는 서로 관련이 없는 클래스에서 공통적으로 사용하는 방식이 필요하지만 각각 구현할 필요가 있을 경우에 사용한다.
+  
+    (구현 객체의 같은 동작을 보장하기 위함)
+- 추상클래스는 `is a kind of` 인터페이스는 `can do this`
+- 추상클래스는 단일 상속, 인터페이스는 다중 상속 가능
 
 ## Collection
 
@@ -209,5 +257,61 @@
 
 ## Thread
 
-#### Process VS Thread
+#### Thread 생성
+
+- Thread 클래스 상속 받은 클래스 생성
+
+  - Thread 클래스는 Runnable 인터페이스를 구현하고 있음
+  - Thread 클래스의 run() 메소드 오버라이딩
+
+  ```java
+  class MyThread extends Thread{
+      public void run(){
+          // 해당 스레드로 수행할 코드
+      }
+  }
+  
+  Thread t1 = new MyThread();
+  ```
+
+  
+
+- Runnable 인터페이스 구현하는 클래스 생성
+
+  - Runnable 인터페이스의 run() 메소드 구현
+  - Thread 생성자로에 해당 Runnable 구현 객체를 파라미터로 전달하여 Thread 객체 생성
+
+  ```java
+  Thread t1 = new Thread(new Runnable(){
+      public void run(){
+         	// 해당 스레드로 수행할 코드
+      }
+  })
+  ```
+
+#### Thread 수행
+
+- run() vs start()
+  - run() 메소드는 직접 호출하지 않는다.
+  - 스레드 수행을 위해서는 start() 메소드를 호출하여 run() 메소드가 호출될 수 있는 준비를 하도록한다.
+  - start() 메소드를 호출하면 JVM은 운영체제의 스레드 스케줄러에 의해 해당 스레드 수행이 가능할 때 run() 메소드를 호출한다.
+
+## Generic
+
+- 다양한 타입의 객체를 다루는 collection 클래스나 메소드에 컴파일 시의 타입 체크를 해주는 기능
+- 즉, 클래스 또는 메소드 내부에서 사용할 데이터 타입을 해당 클래스(메소드) 선언시가 아닌 인스턴스 생성시에 확정하는 것을 말한다.
+
+#### 장점
+
+- 타입 안정성 제공
+  - 의도하지 않은 타입의 객체를 저장하는 것을 막고, 객체 리턴시 의도하지 않았던 타입으로 형변환될 수 있는 오류를 막는다.
+
+- 코드의 간결성 제공
+  - 타입체크와 형변환을 생략할 수 있다.
+
+#### 와일드 카드(wild card)
+
+- <? extends Parent>
+- ?로 선언하여 하나 이상의 타입을 지정할 수 있게한다.
+- Parent 클래스의 자손 클래스 모두 선언 가능하다.
 
