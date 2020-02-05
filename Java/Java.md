@@ -37,6 +37,57 @@
 
 ## GC(Garbage Collection)
 
+#### Heap 메모리 영역 
+
+- Young
+  - Eden : 새로 생성된 객체가 저장되는 부분
+  - Survivor 0
+  - Survivor 1
+- Old
+- Permanent
+
+#### Minor GC
+
+- Eden 영역이 가득차게 되면 GC가 한번 발생하고, 살아남은 객체는 Survivor 영역 중 하나로 이동된다.
+- Survivor 영역은 두 영역을 동시에 사용하지 않고 둘 중 한영역만 번갈아서 사용한다.
+  - Eden영역에서 살아남은 객체를 Survivor 영역으로 옮길 때, 기존 사용중이던 Survivor 영역의 객체들도 모두 다른 Survivor 영역으로 옮긴다. 
+  - Survivor 영역에서 다른 Survivor 영역으로 이동할 때 age값이 증가된다.
+  - 모든 객체가 옮겨지면 기존 사용중이던 Survivor영역과 Eden 영역은 클리어된다.
+  - 이 과정을 반복하다가 일정 시간 이상 살아남아 있는 객체는 Old 영역으로 이동된다.(Promotion)
+
+#### Major GC
+
+- Old 영역에 있는 모든 객체들을 검사하여 참조되지 않은 객체들을 한꺼번에 삭제한다.
+- `stop-the-world` : 시간이 오래걸리는 작업으로, GC 스레드를 제외한 모든 스레드 작업을 멈춘 후 수행한다.
+
+#### GC 동작 원리
+
+- heap 메모리 내의 모든 객체들 중 참조되고 있지 않은 객체를 찾아 소멸시킨다.
+
+- 이때, 참조되고 있는 객체 판단을 위해 reachability 라는 개념을 사용한다.
+
+  - 유효한 참조가 있으면 reachability, 없으면 unreachability로 판단한다.
+  - 참조되고 있는 객체는 다음 4가지 경우로 나눌 수 있다.
+    - heap 내의 다른 객체에 의한 참조
+    - Stack Area의 지역변수, parameter에 의한 참조
+    - JNI 네이티브 스택에 의해 생성된 객체에 의한 참조
+    - Method Area의 static 변수에 의한 참조
+  - 위 4가지 경우 중 2,3,4번은 참조를 시작한 곳으로, 이를 root set이라고 부른다.
+  - 결국 root set에 도달하지 못하는 객체들(Unreachable)은 GC의 대상이 되는 것이다.
+
+  ![javareference2](https://d2.naver.com/content/images/2015/06/helloworld-329631-2.png)
+
+- `mark and sweep` 
+
+  - mark : 모든 객체를 스캔하면서 참조되고 있지 않은 객체를 찾는 과정
+  - sweep : mark 되어있지 않은 객체들을 힙에서 제거하는 과정
+
+- 참고 : https://asfirstalways.tistory.com/159
+
+  ​           https://yaboong.github.io/java/2018/06/09/java-garbage-collection/
+
+  
+
 ## 객체 지향 프로그래밍의 특징
 
 #### 다형성(Polymorphism)
