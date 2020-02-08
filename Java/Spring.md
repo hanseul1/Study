@@ -191,7 +191,8 @@
     - web.xml에 servlet과 url 패턴을 등록하고 매핑하는 과정이 필요하다.
     - 즉, url 당 새로운 servlet을 생성하여 요청을 처리해야 했다.
 - Front Controller
-    - 하나의 Servlet에서 모든 요청을 받아들여 적절한 controller로 요청을 위임해준다.
+    
+  - 하나의 Servlet에서 모든 요청을 받아들여 적절한 controller로 요청을 위임해준다.
   
 - ContextLoaderListener 
 
@@ -208,3 +209,85 @@
   - https://minwan1.github.io/2017/10/08/2017-10-08-Spring-Container,Servlet-Container/
 
   - https://gmlwjd9405.github.io/2018/10/29/web-application-structure.html
+
+
+
+## Error Handling
+
+#### BasicErrorController
+
+- Spring boot에서는 기본적인 에러 처리를 하는 BasicErrorController를 제공한다.
+- 요청한 HTTP의 Accept 헤더에 text/html 이 포함된 경우엔 html 뷰를 반환하고, 그 외는 JSON 객체를 반환한다.
+- 일반적인 spring boot의 페이지 404 에러시 나오는 whitelabel error page는 BasicErrorController에서 반환한 html 뷰이다.
+
+```java
+// text/html가 포함된 헤더가 있는 요청에는 뷰를 반환
+@RequestMapping(produces = {"text/html"})
+public ModelAndView errorHtml(HttpServletRequest request, HttpServletResponse response) {
+    HttpStatus status = this.getStatus(request);
+    Map<String, Object> model = Collections.unmodifiableMap(this.getErrorAttributes(request, this.isIncludeStackTrace(request, MediaType.TEXT_HTML)));
+    response.setStatus(status.value());
+    ModelAndView modelAndView = this.resolveErrorView(request, response, status, model);
+    return modelAndView != null ? modelAndView : new ModelAndView("error", model);
+}
+
+// 그 외에는 json 객체를 반환
+@RequestMapping
+  public ResponseEntity<Map<String, Object>> error(HttpServletRequest request) {
+      Map<String, Object> body = this.getErrorAttributes(request, this.isIncludeStackTrace(request, MediaType.ALL));
+      HttpStatus status = this.getStatus(request);
+      return new ResponseEntity(body, status);
+  }
+```
+
+
+
+#### @ExceptionHandler
+
+- @Controller 어노테이션으로 선언된 컨트롤러 내의 메소드에서 발생한 Exception을 처리한다.
+
+  ```java
+  @Controller public class SimpleController { 
+      // ... 
+      @ExceptionHandler 
+      public ResponseEntity<String> handle(Exception ex) { 
+          // ... 
+      } 
+  }
+  ```
+
+- Exception 마다 처리 방식이 다를 경우, @ExceptionHandler에 대상 Exception 목록을 지정하여 각각 처리할 수 있다.
+
+  ```java
+  @ExceptionHandler({FileSystemException.class, RemoteException.class})
+  ```
+
+#### @ControllerAdvice
+
+- @Controller에 정의된 @ExceptionHandler는 해당 컨트롤러에서만 동작한다.
+
+- 모든 컨트롤러에서 공통적으로 처리할 에러가 있을 경우
+
+  - @ControllerAdvice 어노테이션으로 선언된 컨트롤러에서 @ExceptionHandler 를 선언하여 모든 컨트롤러에 대해 발생한 전역 에러 처리를 할 수 있다.
+
+  ```java
+  @Controller 
+  @ControllerAdvice 
+  public class GlobalExceptionController { 
+      // ... 
+      @ExceptionHandler 
+      public ResponseEntity<String> handle(IOException ex) { 
+          // ... 
+      } 
+  }
+  ```
+
+- 컨트롤러 대상을 좁히고 싶을 경우 어노테이션, 패키지, 클래스 기준으로 지정해서 사용할 수 있다.
+
+  ```java
+  @ControllerAdvice(annotations=RestController.class)
+  @ControllerAdvice("com.hs.reivew.controller")
+  @ControllerAdvice(assignableTypes = {ControllerInterface.class})
+  ```
+
+  
