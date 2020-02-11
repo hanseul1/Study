@@ -170,6 +170,26 @@
 
 ## Spring MVC
 
+#### Servlet과 Spring MVC
+
+- Servlet은 J2EE 프레임워크의 일부이며, 모든 JAVA 어플리케이션 서버(tomcat 등)는 서블릿을 실행하기 위해 빌드된다.
+
+  - Servlet은 Web Server의 요청을 동적으로 처리 가능한 자바 클래스이다.
+  - 하나의 Servlet 클래스는 하나의 URL과 매핑된다.
+    - 하나의 클래스에서 여러 URL을 처리하기 위해서는 파싱하여 분리하는 복잡한 방법을 사용해야 한다.
+  - 미리 패키징 되어있기 때문에 Servlet.jar 가 필요하지 않다.
+
+- Spring MVC는 MVC 패턴을 적용하여 좀 더 쉽게 개발을 하기 위해 사용되는 Servlet 위에 구축된 라이브러리이다.
+
+  (Spring에서 제공하는 다양한 모듈 중 하나)
+  - Form 데이터 parameter, 컨트롤러 메서드의 parameter 매핑, 바이너리 form 제출, bean 변환 등을 쉽게 처리할 수 있는 기능들을 제공한다.
+  - 하나의 클래스에서 여러 URL과 매핑되는 여러 메소드를 관리할 수 있다.
+  - Spring 컨트롤러를 실행하려면 필요한 jar 파일을 패키징 해야한다.
+
+- 즉, Servlet은 Java Application의 Low 레벨에서 동작하고, Spring MVC는 그것 보다는 High 레벨에서 동작한다고 할 수 있다.
+
+  
+
 #### Spring Container
 
 - 어플리케이션의 Bean들의 생명주기를 관리하는 컨테이너
@@ -191,7 +211,7 @@
     - web.xml에 servlet과 url 패턴을 등록하고 매핑하는 과정이 필요하다.
     - 즉, url 당 새로운 servlet을 생성하여 요청을 처리해야 했다.
 - Front Controller
-    
+  
   - 하나의 Servlet에서 모든 요청을 받아들여 적절한 controller로 요청을 위임해준다.
   
 - ContextLoaderListener 
@@ -261,6 +281,8 @@ public ModelAndView errorHtml(HttpServletRequest request, HttpServletResponse re
   ```java
   @ExceptionHandler({FileSystemException.class, RemoteException.class})
   ```
+
+
 
 #### @ControllerAdvice
 
