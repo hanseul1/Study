@@ -39,7 +39,82 @@
 
 ## DI(Dependency Injection)
 
+#### Java Bean VS Spring Bean
+
+- Java Bean은 데이터를 표현하는 것을 목적으로 하는 자바 클래스
+  - 생성자, getter/setter 를 가지고, 직렬화가 가능한 클래스
+- Spring Bean은 Spring container에 의해 등록, 생성, 조회, 관계 설정이 되는 객체
+  - 즉, IoC 방식으로 관리되는 객체를 말한다.
+
+#### 일반적인 의존 관계와 의존 역전 원칙
+
+- 일반적인 의존 관계
+  - 일반적인 프로그램의 흐름에 따라 객체 내에서 필요한 객체가 있을 때, 필요한 객체를 직접 생성하고, 직접 객체의 메소드를 호출한다.
+  - 즉, 모든 작업은 사용하는 쪽에서 제어한다.
+- 의존 역전 원칙(DIP, Dependency Inversion Principle)
+  - 객체 내에서 필요한 객체가 있을 때, 직접 객체를 생성하는 것이 아니라, 생성된 객체를 받아서 사용한다.
+  - 또한 사용할 객체의 구현 클래스가 아닌 인터페이스를 사용함으로써 실제 객체가 어떤 타입이든 관계없이 같은 코드를  사용할 수 있다.
+  - 즉, 객체간의 의존 관계가 뒤집어진 의존 역전 원칙이 되는 것이다.
+
+#### BeanFactory & ApplicationContext
+
+- BeanFactory
+  - Bean을 생성하고 관리하는 인터페이스
+  - 클라이언트의 요청이 있을 때 객체를 생성한다.(lazy-init)
+- ApplicationContext
+  - BeanFactory 인터페이스를 상속받은 인터페이스
+  - 컨테이너가 구동되는 시점에 등록된 Bean 객체들을 모두 스캔하여 생성한다.(eager init)
+
+#### Annotation
+
+- bean 등록 annotation
+  - `@Bean` : 개발자가 컨트롤할 수 없는 외부 라이브러리 bean을 등록하고 싶은 경우
+  - `@Component` : 개발자가 직접 만든 클래스를 bean으로 등록하고 싶은 경우
+  - `@Controller` `@Service` `@Repository` : 클래스의 기능에 따라 명칭을 다르게 부여한 bean
+- bean 주입 annotation
+  - `@Autowired` : 타입으로 참조할 bean을 찾아 주입
+    - `@Qualifier`  : 같은 인터페이스를 구현한 클래스가 여러개 일때, 이름으로 구별해주기 위한 annotation
+  - `@Resource` : 이름으로 참조할 bean을 찾아 주입
+
+#### Bean 생성 순서
+
+- 의존 관계가 있는 경우
+
+  - 각 Bean들이 순서대로 생성, 초기화된다. 
+
+    - Spring에서는 web.xml에 선언된 순서대로
+    - Spring boot 에서는 패키지 순서대로 
+
+  - Bean 생성 중 의존하고 있는 Bean이 존재할 때 
+
+    - 의존하는 Bean이 아직 생성되지 않은 경우 먼저 해당 Bean을 생성 및 초기화 한다.
+
+    - Spring Container에 등록되지 않은 bean(xml 설정 파일이나 어노테이션이 없는 bean)은 Spring Container가 spring bean으로써 관리할 수 없기 때문에, 해당 bean을 생성하는 시점에 의존하고 있는 bean이 생성되지 않아도 먼저 생성해주지 않는다.
+
+      => 의존하는 bean이 null 값이 되는 경우가 발생할 수 있다.
+
+- 참고 : https://sehun-kim.github.io/sehun/springbean-lifecycle/
+
+  
+
 ## IoC(Inversion of Control)
+
+#### Spring Container
+
+- Spring Container는 개발자가 작성한 코드의 처리과정을 위임받아 독립적으로 처리하는 컨테이너이다.
+
+- 사용하는 이유
+
+  - 이전까지는 클래스 내에서 다른 객체를 사용하고 싶을 때 직접 new 연산자로 객체를 생성하고, getter/ setter로 값을 관리하여야 했다.
+
+  - 이는 높은 의존성과 결합도를 가지게 된다.
+
+    - 프로그램 내에서 서로 생성하고 참조하는 객체가 많아지게 된다.
+    - 즉, 참조되는 객체의 구현이 바뀌게 되면 그 객체를 참조하고 있는 객체에서의 생성과 호출(사용)도 바뀌어야 한다. => 의존성이 높다.
+
+  - OOP는 낮은 의존성과 높은 캡슐화를 지향하기 때문에 의존성을 낮추기 위해 Spring Container를 사용한다.
+
+    
 
 ## Servlet
 
@@ -165,8 +240,12 @@
   - 각 코드의 재사용성이 떨어져 유지보수가 어려워지고 효율성이 떨어진다.
 - MVC2 패턴
   - controller 역할은 servlet이, view 역할은 JSP가 담당한다.
+  
   - 서블릿이 클라이언트의 요청을 받아 처리 후 결과를 JSP 페이지에 포워딩 한다.
+  
   - 코드의 유지보수 및 확장이 용이하다.
+  
+    
 
 ## Spring MVC
 
