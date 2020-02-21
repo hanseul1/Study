@@ -366,3 +366,109 @@
 - ?로 선언하여 하나 이상의 타입을 지정할 수 있게한다.
 - Parent 클래스의 자손 클래스 모두 선언 가능하다.
 
+
+
+## Serialization
+
+\- 자바 시스템 내부에서 사용되는 객체 또는 데이터를 외부의 자바 시스템에서도 사용할 수 있도록 Byte 형태로 데이터를 변환하는 기술 
+
+\- 역직렬화 : 바이트로 변환된 데이터를 다시 객체 형태로 변환하는 기술
+
+\- JVM 메모리의 힙 또는 스택에 상주하는 객체 데이터를 바이트 형태로 변환하는 기술을 말한다.
+
+ 
+
+\- 직렬화 조건 : primitive 타입과 java.io.Serializable 인터페이스를 상속받은 객체는 직렬화할 수 있다.
+
+\- 직렬화 방법 : ObjectOutputStream 객체를 이용하여 객체를 write한다.
+
+```
+Member member = new Member("김배민", "deliverykim@baemin.com", 25);
+    byte[] serializedMember;
+    try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+            oos.writeObject(member);
+            // serializedMember -> 직렬화된 member 객체 
+            serializedMember = baos.toByteArray();
+        }
+    }
+    
+ // 바이트 배열로 생성된 직렬화 데이터를 base64로 변환
+ System.out.println(Base64.getEncoder().encodeToString(serializedMember));
+```
+
+ 
+
+\- 역직렬화 조건 
+
+- 직렬화 대상이 된 객체의 클래스가 클래스 패스에 존재해야하며, import 되어 있어야 한다.
+
+- 자바 직렬화 대상 객체는 동일한 SerialVersionUID 를 가지고 있어야 한다.
+
+\- 역직렬화 방법 : ObjectInputStream 객체를 이용하여 객체를 read한다.
+
+ 
+
+```
+// 직렬화 예제에서 생성된 base64 데이터 
+    String base64Member = "...생략";
+    byte[] serializedMember = Base64.getDecoder().decode(base64Member);
+    try (ByteArrayInputStream bais = new ByteArrayInputStream(serializedMember)) {
+        try (ObjectInputStream ois = new ObjectInputStream(bais)) {
+            // 역직렬화된 Member 객체를 읽어온다.
+            Object objectMember = ois.readObject();
+            Member member = (Member) objectMember;
+            System.out.println(member);
+        }
+    }
+```
+
+ 
+
+\- 문자열 형태의 직렬화 방법 : CSV, JSON(다른 데이터 포맷 방식에 비해 오버헤드가 적기 때문에 많이 사용)
+
+ => 라이브러리를 이용하여 직렬화 가능
+
+ 
+
+#### **자바 직렬화를 사용하는 이유**
+
+\- CSV, JSON 같은 데이터 직렬화 형식은 시스템의 고유 특성과 상관없이 대부분의 시스템에서의 데이터 교환시 사용한다.
+
+\- 자바 직렬화 형태의 데이터 교환은 자바 시스템간의 데이터 교환을 위해 존재한다.
+
+- 즉, 자바 시스템에서의 개발에 최적화 되어있다.
+
+- 복잡한 데이터 구조의 클래스의 객체라도 간단하게 직렬화, 역직렬화가 가능하다.
+
+- 데이터 타입이 자동으로 맞춰지기 때문에 편하게 사용 가능하다.
+
+ 
+
+
+
+![img](https://k.kakaocdn.net/dn/K0orG/btqzl49X2YI/KzIB7zC8smpYl3WnuFtu3k/img.jpg)
+
+
+
+#### **자바 직렬화를 사용하는 곳**
+
+\- JVM 메모리에 상주하는 데이터를 그대로 영속화(persistence)가 필요할 때 사용한다.
+
+\- 시스템이 종료되더라도 없어지지 않는 장점을 가지며 영속화된 데이터이기 때문에 네트워크 전송도 가능하다.
+
+ 
+
+\- 서블릿 세션(Servlet Session)
+
+ : 서블릿 기반의 WAS들은 대부분 세션의 자바 직렬화를 지원하고 있다.
+
+  단순히 세션을 서블릿 메모리 위에서만 운용한다면 직렬화는 필요하지 않지만, 파일로 저장하거나 세션 클러스터링, DB를 저장하는 옵션 등을 선택하게 되면 세션 자체가 직렬화되어 전달된다.
+
+   => 세션에 필요한 객체는 Serializable 인터페이스를 구현하는 것이 좋다.
+
+ 
+
+\- 캐시(cache)
+
+ : 자바 시스템에서 DB 데이터를 조회한 정보를 메모리, 외부저장소 등의 캐시에 저장할 때 자바 직렬화된 데이터를 저장하도록 한다.
