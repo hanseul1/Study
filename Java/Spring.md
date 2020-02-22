@@ -392,3 +392,46 @@ public ModelAndView errorHtml(HttpServletRequest request, HttpServletResponse re
   ```
 
   
+
+## Filter VS Interceptor
+
+![img](https://t1.daumcdn.net/cfile/tistory/9983FB455BB4E5D30C)
+
+#### Filter
+
+- Dispatcher Servlet의 앞단에서 클라이언트의 요청과 응답을 처리하는 역할
+
+- J2EE 표준 스펙에 정의되어있는 기능
+
+  - 즉, Servlet Container에 의해 동작이 제어되는 Java class이다.
+  - Spring Framework와는 무관하게 지정된 자원에 대해서 동작한다.
+
+- 주로 전역적으로 무언가 처리해야하는 로직을 구현할 때 사용한다.
+
+  - ex) 인코딩, 보안 처리(XSS)
+
+- Filter chain을 가지고 순서대로 동작한다.
+
+  ```java
+  public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+      /**
+          filtering 로직 구현 
+      */
+  
+      // 해당 필터의 처리 결과를 다음 필터로 넘겨주는 역할
+      // 다음 필터가 없다면 서블릿으로 전달
+      filterChain.doFilter(servletRequest, servletResponse);
+  }
+  ```
+
+- web.xml 또는 Java configuration을 이용해 구현한다.
+
+  
+
+#### Interceptor
+
+- Spring Context 내에서 HttpRequest와 HttpResponse를 처리하는 역할
+  - Dispatcher Servlet에서 Controller로 요청이 넘어가기 전 처리된다.
+  - Spring 내의 모든 bean에 접근할 수 있다.
+- 인증, 권한, 업로드 파일 처리 등의 디테일한 로직을 구현할 때 사용한다.
+- ServletContext.xml 또는 Java configuration을 이용해 구현한다.
